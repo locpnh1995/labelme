@@ -8,6 +8,7 @@ import re
 import webbrowser
 
 import imgviz
+from numpy import poly
 from qtpy import QtCore
 from qtpy.QtCore import Qt
 from qtpy import QtGui
@@ -411,6 +412,15 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Delete the selected polygons"),
             enabled=False,
         )
+
+        merge = action(
+            self.tr("Merge Polygons"),
+            self.mergeSelectedShape,
+            shortcuts["merge_polygon"],
+            "merge",
+            self.tr("Merge the selected polygons")
+        )
+
         copy = action(
             self.tr("Duplicate Polygons"),
             self.copySelectedShape,
@@ -606,6 +616,7 @@ class MainWindow(QtWidgets.QMainWindow):
             deleteFile=deleteFile,
             toggleKeepPrevMode=toggle_keep_prev_mode,
             delete=delete,
+            merge=merge,
             edit=edit,
             editValue=editValue,
             copy=copy,
@@ -640,6 +651,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 copy,
                 convertToRectangleOrPolygon,
                 delete,
+                merge,
                 None,
                 undo,
                 undoLastPoint,
@@ -662,6 +674,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 editValue,
                 copy,
                 delete,
+                merge,
                 undo,
                 undoLastPoint,
                 addPointToEdge,
@@ -1167,6 +1180,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._noSelectionSlot = False
         n_selected = len(selected_shapes)
         self.actions.delete.setEnabled(n_selected)
+        self.actions.merge.setEnabled(n_selected)
         self.actions.copy.setEnabled(n_selected)
         self.actions.convertToRectangleOrPolygon.setEnabled(n_selected)
         self.actions.edit.setEnabled(n_selected == 1)
@@ -1372,6 +1386,59 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.labelList.clearSelection()
 
                 self.setDirty()
+
+    def mergeSelectedShape(self):
+        def convertPolygonToRect(rectShape):
+            if rectShape.shape_type == "polygon" and len(rectShape.points) >= 4:
+                points = [[point.x(), point.y()] for point in rectShape.points]
+                xmin = min([point[0] for point in points])
+                ymin = min([point[1] for point in points])
+                xmax = max([point[0] for point in points])
+                ymax = max([point[1] for point in points])
+                first_point = QtCore.QPointF(xmin, ymin)
+                second_point = QtCore.QPointF(xmax, ymax)
+                rectShape.points = [first_point, second_point]
+                rectShape.shape_type = "rectangle"
+            else:
+                raise TypeError(f"Only support polygon shape, given {rectShape.shape_type}")
+
+        targetConvertShapes = self.canvas.selectedShapes
+        if len(set([shape.label for shape in targetConvertShapes])) != 1:
+            self.errorMessage(
+                self.tr("Only support merge shapes with the same label"),
+                self.tr("Only support merge shapes with the same label")
+            )
+            return
+
+        if len(targetConvertShapes) >= 2:
+            # Convert all polygon/rect to rect shape
+            for shape in targetConvertShapes:
+                if shape.shape_type == "polygon":
+                    convertPolygonToRect(shape)
+
+            points = []
+            for shape in targetConvertShapes:
+                if len(shape.points) == 2:
+                    points += shape.points
+            
+            xmin = min([point.x() for point in points])
+            ymin = min([point.y() for point in points])
+            xmax = max([point.x() for point in points])
+            ymax = max([point.y() for point in points])
+
+            first_point = QtCore.QPointF(xmin, ymin)
+            second_point = QtCore.QPointF(xmax, ymax)
+            merged_points = [first_point, second_point]
+
+            merged_shape = Shape(label=targetConvertShapes[0].label, shape_type="rectangle")
+            merged_shape.points = merged_points
+
+            self.addLabel(merged_shape)
+
+            self.deleteSelectedShape(True)
+            self.labelList.clearSelection()
+
+            self.setDirty()
 
     def copySelectedShape(self):
         added_shapes = self.canvas.copySelectedShapes()

@@ -20,6 +20,7 @@
       <br/>
       <br/>
 - [x] **Convert** Rectangle <--> Polygon in Right Click menu (**Ctrl+T**).
+- [x] **Merge** shapes into a Rectangle shape in Right Click menu (**Ctrl+M**).
 
 _enhanced by locpnh_
 
