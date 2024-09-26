@@ -97,11 +97,13 @@ shortcuts:
   create_linestrip: null
   edit_polygon: Ctrl+J
   delete_polygon: Delete
+  merge_polygon: Ctrl+M
   duplicate_polygon: Ctrl+D
   convert_to_rectangle_polygon: Ctrl+T
   undo: Ctrl+Z
   undo_last_point: [Ctrl+Z, Backspace]
   add_point_to_edge: Ctrl+Shift+P
   edit_label: Ctrl+E
+  multi_edit_labels: Ctrl+Y
   edit_value: Ctrl+G
   toggle_keep_prev_mode: Ctrl+P

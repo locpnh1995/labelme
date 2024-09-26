@@ -12,13 +12,11 @@ class UniqueLabelQListWidget(EscapableQListWidget):
         if not self.indexAt(event.pos()).isValid():
             self.clearSelection()
 
-    def findItemsByLabel(self, label):
-        items = []
+    def findItemByLabel(self, label):
         for row in range(self.count()):
             item = self.item(row)
             if item.data(Qt.UserRole) == label:
-                items.append(item)
-        return items
+                return item
 
     def createItemFromLabel(self, label):
         item = QtWidgets.QListWidgetItem()

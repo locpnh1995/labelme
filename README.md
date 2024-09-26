@@ -20,6 +20,9 @@
       <br/>
       <br/>
 - [x] **Convert** Rectangle <--> Polygon in Right Click menu (**Ctrl+T**).
+- [x] **Merge** shapes (belong to the same label) into a Rectangle shape in Right Click menu (**Ctrl+M**).
+- [x] **Move** with arrow keys
+- [x] **Select** multiple shapes
 
 _enhanced by locpnh_
 
@@ -37,9 +40,14 @@ Remove **.labelmerc** file to apply the new keyboard shortcuts
 conda create --name labelme
 conda activate labelme
 ```
-
-2. Download or Clone [locpnh1995/labelme](https://github.com/locpnh1995/labelme/) source code.
-3. Change directory to **labelme** folder, then run:
+2. Install dependencies
+```bash
+sudo apt install python-matplotlib
+sudo apt install dkg-config
+sudo apt-get install freetype6-dev
+```
+3. Download or Clone [davisionteam/labelme](https://github.com/davisionteam/labelme) source code.
+4. Change directory to **labelme** folder, then run:
 
 ```bash
 # Uninstall the old version
@@ -49,4 +57,4 @@ pip uninstall labelme
 pip install -e .
 ```
 
-4. Type `labelme` on Terminal to open GUI.
+5. Type `labelme` on Terminal to open GUI.
